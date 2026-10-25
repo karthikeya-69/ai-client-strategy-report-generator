@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>AI Client Strategy Report Generator</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: auto;
+            padding: 30px;
+        }
+
+        input, textarea, button {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+
+        button {
+            background: black;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+
+        #result {
+            margin-top: 20px;
+            background: #f4f4f4;
+            padding: 15px;
+            white-space: pre-wrap;
+        }
+
+        #pdfLink {
+            display: none;
+            margin-top: 15px;
+        }
+    </style>
+
+</head>
+
+
+<body>
+
+
+<h1>AI Client Strategy Report Generator</h1>
+
+
+<input 
+id="client"
+placeholder="Client Name">
+
+
+<input 
+id="industry"
+placeholder="Industry">
+
+
+<textarea 
+id="goals"
+placeholder="Business Goals"></textarea>
+
+
+<button onclick="generateReport()">
+Generate Report
+</button>
+
+
+
+<div id="result"></div>
+
+
+<a id="pdfLink" target="_blank">
+Download PDF
+</a>
+
+
+
+<script>
+
+
+async function generateReport(){
+
+
+    const result =
+    document.getElementById("result");
+
+
+    const pdfLink =
+    document.getElementById("pdfLink");
+
+
+
+    result.innerHTML =
+    "Generating...";
+
+
+    pdfLink.style.display =
+    "none";
+
+
+
+    try{
+
+
+        const response =
+        await fetch("/generate", {
+
+
+            method: "POST",
+
+
+            headers: {
+
+                "Content-Type": "application/json"
+
+            },
+
+
+            body: JSON.stringify({
+
+
+                client_name:
+                document.getElementById("client").value,
+
+
+                industry:
+                document.getElementById("industry").value,
+
+
+                goals:
+                document.getElementById("goals").value
+
+            })
+
+        });
+
+
+
+        const raw =
+        await response.text();
+
+
+        console.log(
+        "SERVER RESPONSE:",
+        raw
+        );
+
+
+        const data =
+        JSON.parse(raw);
+
+
+
+        if(data.strategy_report){
+
+
+            result.innerHTML =
+            data.strategy_report;
+
+
+        }
+        else{
+
+
+            result.innerHTML =
+            JSON.stringify(data, null, 2);
+
+
+        }
+
+
+
+        if(data.pdf_file){
+
+
+            pdfLink.href =
+            data.pdf_file;
+
+
+            pdfLink.innerHTML =
+            "Download PDF";
+
+
+            pdfLink.style.display =
+            "block";
+
+
+        }
+
+
+
+    }
+
+
+    catch(error){
+
+
+        console.log(error);
+
+
+        result.innerHTML =
+        "Error generating report";
+
+
+    }
+
+
+}
+
+
+
+</script>
+
+
+</body>
+
+</html>
